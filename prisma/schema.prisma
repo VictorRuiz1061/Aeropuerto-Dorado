@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model usuario {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  email    String @unique
+  password String
+}
+
+
+model vuelo {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  salabordaje String
+  horasalida  String
+  horallegada String
+  codvuelo    String
+  destinoId   String  @db.ObjectId
+  destino     destino @relation(fields: [destinoId], references: [id])
+  aerolineaId String    @db.ObjectId
+  aerolinea   aerolinea @relation(fields: [aerolineaId], references: [id])
+  pasajeros   pasajero[]
+}
+
+model destino {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  descripcion String
+  vuelos      vuelo[]
+}
+
+model aerolinea {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  descripcion String
+  vuelos      vuelo[]
+}
+
+model pasajero {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  nombre    String
+  apellidos String
+  email     String   @unique
+  telefono  String
+  foto      String
+  vueloId   String   @db.ObjectId
+  vuelo     vuelo    @relation(fields: [vueloId], references: [id])
+}
