@@ -9,6 +9,55 @@ function validateEmail(email) {
   return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
 }
 
+/**
+ * @swagger
+ * /api/dorado/auth/register:
+ *   post:
+ *     summary: Registra un nuevo usuario
+ *     tags: [Autenticación]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Email del nuevo usuario
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 description: Contraseña del nuevo usuario (mínimo 6 caracteres)
+ *     responses:
+ *       201:
+ *         description: Usuario registrado exitosamente. Retorna un token JWT y los datos del usuario.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token de autenticación JWT
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *       400:
+ *         description: Datos de entrada inválidos (email o contraseña).
+ *       409:
+ *         description: El usuario ya existe.
+ *       500:
+ *         description: Error interno del servidor.
+ */
 export async function POST(request) {
   try {
     const { email, password } = await request.json();

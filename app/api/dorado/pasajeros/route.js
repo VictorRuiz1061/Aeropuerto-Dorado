@@ -24,6 +24,40 @@ async function savePhotoFile(file) {
   return `/uploads/pasajeros/${fileName}`;
 }
 
+/**
+ * @swagger
+ * /api/dorado/pasajeros:
+ *   get:
+ *     summary: Obtiene todos los pasajeros
+ *     tags: [Pasajeros]
+ *     responses:
+ *       200:
+ *         description: Lista de todos los pasajeros.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   nombre:
+ *                     type: string
+ *                   apellidos:
+ *                     type: string
+ *                   email:
+ *                     type: string
+ *                   telefono:
+ *                     type: string
+ *                   foto:
+ *                     type: string
+ *                     format: url
+ *                   vueloId:
+ *                     type: string
+ *       500:
+ *         description: Error del servidor
+ */
 export async function GET() {
   const pasajeros = await prisma.pasajero.findMany({
     include: { vuelo: true }, // opcional
@@ -31,6 +65,80 @@ export async function GET() {
   return json(pasajeros);
 }
 
+/**
+ * @swagger
+ * /api/dorado/pasajeros:
+ *   post:
+ *     summary: Crea un nuevo pasajero
+ *     tags: [Pasajeros]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - nombre
+ *               - apellidos
+ *               - email
+ *               - telefono
+ *               - vueloId
+ *               - foto
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *                 description: Nombre del pasajero
+ *               apellidos:
+ *                 type: string
+ *                 description: Apellidos del pasajero
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Email del pasajero
+ *               telefono:
+ *                 type: string
+ *                 description: Teléfono del pasajero
+ *               vueloId:
+ *                 type: string
+ *                 description: ID del vuelo al que pertenece el pasajero
+ *               foto:
+ *                 type: string
+ *                 format: binary
+ *                 description: Archivo de imagen de la foto del pasajero
+ *     responses:
+ *       200:
+ *         description: Pasajero creado exitosamente. 
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Pasajero creado exitosamente
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     nombre:
+ *                       type: string
+ *                     apellidos:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     telefono:
+ *                       type: string
+ *                     foto:
+ *                       type: string
+ *                       format: url
+ *                     vueloId:
+ *                       type: string
+ *       400:
+ *         description: Datos de entrada inválidos o campos obligatorios faltantes.
+ *       500:
+ *         description: Error del servidor
+ */
 export async function POST(request) {
   try {
     const formData = await request.formData();

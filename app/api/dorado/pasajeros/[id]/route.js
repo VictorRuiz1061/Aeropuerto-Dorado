@@ -40,6 +40,47 @@ function deletePhotoFile(filePath) {
   }
 }
 
+/**
+ * @swagger
+ * /api/dorado/pasajeros/{id}:
+ *   get:
+ *     summary: Obtiene un pasajero por ID
+ *     tags: [Pasajeros]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID del pasajero
+ *     responses:
+ *       200:
+ *         description: Detalles del pasajero.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 nombre:
+ *                   type: string
+ *                 apellidos:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 telefono:
+ *                   type: string
+ *                 foto:
+ *                   type: string
+ *                   format: url
+ *                 vueloId:
+ *                   type: string
+ *       404:
+ *         description: Pasajero no encontrado.
+ *       500:
+ *         description: Error del servidor
+ */
 export async function GET(request, { params }) {
   const { id } = params;
   try {
@@ -59,6 +100,82 @@ export async function GET(request, { params }) {
   }
 }
 
+/**
+ * @swagger
+ * /api/dorado/pasajeros/{id}:
+ *   put:
+ *     summary: Actualiza un pasajero por ID
+ *     tags: [Pasajeros]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID del pasajero a actualizar
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *                 description: Nombre del pasajero
+ *               apellidos:
+ *                 type: string
+ *                 description: Apellidos del pasajero
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Email del pasajero
+ *               telefono:
+ *                 type: string
+ *                 description: Teléfono del pasajero
+ *               vueloId:
+ *                 type: string
+ *                 description: ID del vuelo al que pertenece el pasajero
+ *               foto:
+ *                 type: string
+ *                 format: binary
+ *                 description: Archivo de imagen de la foto del pasajero (opcional, si se actualiza)
+ *     responses:
+ *       200:
+ *         description: Pasajero actualizado exitosamente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Pasajero actualizado exitosamente
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     nombre:
+ *                       type: string
+ *                     apellidos:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     telefono:
+ *                       type: string
+ *                     foto:
+ *                       type: string
+ *                       format: url
+ *                     vueloId:
+ *                       type: string
+ *       400:
+ *         description: Datos de entrada inválidos.
+ *       404:
+ *         description: Pasajero no encontrado.
+ *       500:
+ *         description: Error del servidor
+ */
 export async function PUT(request, { params }) {
   const { id } = params;
 
@@ -113,6 +230,35 @@ export async function PUT(request, { params }) {
   }
 }
 
+/**
+ * @swagger
+ * /api/dorado/pasajeros/{id}:
+ *   delete:
+ *     summary: Elimina un pasajero por ID
+ *     tags: [Pasajeros]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID del pasajero a eliminar
+ *     responses:
+ *       200:
+ *         description: Pasajero eliminado correctamente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Pasajero eliminado correctamente
+ *       404:
+ *         description: Pasajero no encontrado.
+ *       500:
+ *         description: Error del servidor
+ */
 export async function DELETE(request, { params }) {
   const { id } = params;
   try {

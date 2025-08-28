@@ -9,6 +9,55 @@ function validateEmail(email) {
   return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
 }
 
+/**
+ * @swagger
+ * /api/dorado/auth/login:
+ *   post:
+ *     summary: Inicia sesión de usuario
+ *     tags: [Autenticación]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Email del usuario
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 description: Contraseña del usuario (mínimo 6 caracteres)
+ *     responses:
+ *       200:
+ *         description: Inicio de sesión exitoso. Retorna un token JWT y los datos del usuario.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token de autenticación JWT
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *       400:
+ *         description: Credenciales inválidas o datos faltantes.
+ *       401:
+ *         description: Usuario o contraseña incorrectos.
+ *       500:
+ *         description: Error interno del servidor.
+ */
 export async function POST(request) {
   try {
     const { email, password } = await request.json();
@@ -51,4 +100,4 @@ export function verifyJWT(request) {
   } catch {
     return null;
   }
-} 
+}
