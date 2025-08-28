@@ -1,0 +1,7 @@
+rs.status()
+})
+  ]
+    { _id: 0, host: "localhost:27017" }
+  members: [
+  _id: "rs0",
+rs.initiate({

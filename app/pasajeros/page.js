@@ -10,27 +10,23 @@ export default function Page() {
   const [error, setError] = useState(null);
   const router = useRouter();
 
-  const apiRequest = async (url, options = {}) => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/");
-      throw new Error("No autenticado");
-    }
-    const res = await fetch(url, {
-      ...options,
-      headers: { 'Authorization': `Bearer ${token}`, ...options.headers },
-    });
-    if (!res.ok) {
-      const errorBody = await res.text();
-      throw new Error(errorBody || "Error en la solicitud");
-    }
-    return res.json();
-  };
-
+  // Moved fetchPasajeros before handleDelete to ensure it's defined
   const fetchPasajeros = async () => {
     try {
       setLoading(true);
-      const data = await apiRequest("/api/dorado/pasajeros");
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/");
+        return;
+      }
+      const res = await fetch("/api/dorado/pasajeros", {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const errorBody = await res.json();
+        throw new Error(errorBody.error || "Error en la solicitud");
+      }
+      const data = await res.json();
       setPasajeros(data);
     } catch (err) {
       setError(err.message);
@@ -42,8 +38,20 @@ export default function Page() {
   const handleDelete = async (id) => {
     if (!confirm("¿Estás seguro de eliminar este pasajero?")) return;
     try {
-      await apiRequest(`/api/pasajeros/${id}`, { method: "DELETE" });
-      fetchPasajeros();
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/");
+        return;
+      }
+      const res = await fetch(`/api/dorado/pasajeros/${id}`, {
+        method: "DELETE",
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const errorBody = await res.json();
+        throw new Error(errorBody.error || "Error al eliminar");
+      }
+      fetchPasajeros(); // Refresh the list
     } catch (err) {
       alert("Error al eliminar: " + err.message);
     }
@@ -65,26 +73,32 @@ export default function Page() {
       {loading ? (
         <div className="text-center text-gray-500 dark:text-gray-400">Cargando...</div>
       ) : error ? (
-        <div className="text-center text-red-500">{error}</div>
+        <div className="p-4 text-center text-red-500 bg-red-100 rounded-md">{error}</div>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {pasajeros.map((pasajero) => (
-            <div key={pasajero.id} className="p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{pasajero.nombre} {pasajero.apellidos}</h2>
-                <div className="flex space-x-2">
-                  <button onClick={() => router.push(`/pasajeros/crear?id=${pasajero.id}`)} className="p-2 text-gray-500 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
-                    ✏️
-                  </button>
-                  <button onClick={() => handleDelete(pasajero.id)} className="p-2 text-gray-500 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
-                    🗑️
-                  </button>
+            <div key={pasajero.id} className="overflow-hidden bg-white rounded-lg shadow-md dark:bg-gray-800">
+                <div className="relative">
+                    <img className="object-cover w-full h-48" src={pasajero.foto || 'https://via.placeholder.com/400x300'} alt={`Foto de ${pasajero.nombre}`} />
                 </div>
-              </div>
-              <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                <p>{pasajero.email}</p>
-                <p>{pasajero.telefono}</p>
-              </div>
+                <div className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white truncate">{pasajero.nombre} {pasajero.apellidos}</h2>
+                        <div className="flex space-x-1">
+                        <button onClick={() => router.push(`/pasajeros/crear?id=${pasajero.id}`)} className="p-2 text-gray-500 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
+                            ✏️
+                        </button>
+                        <button onClick={() => handleDelete(pasajero.id)} className="p-2 text-gray-500 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
+                            🗑️
+                        </button>
+                        </div>
+                    </div>
+                    <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                        <p className="truncate">{pasajero.email}</p>
+                        <p>{pasajero.telefono}</p>
+                        <p>Vuelo: {pasajero.vuelo?.codvuelo || 'N/A'}</p>
+                    </div>
+                </div>
             </div>
           ))}
         </div>
